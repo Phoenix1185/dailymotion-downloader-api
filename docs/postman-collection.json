@@ -1,0 +1,201 @@
+{
+  "info": {
+    "_postman_id": "dailymotion-api-2026",
+    "name": "DailyMotion Downloader API",
+    "description": "Complete API collection for DailyMotion video downloader with auth, payments, and admin endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": ["{{base_url}}"],
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"securepassword123\",\n  \"name\": \"John Doe\"\n}"
+            },
+            "url": {"raw": "{{base_url}}/api/v1/auth/register", "host": ["{{base_url}}"], "path": ["api", "v1", "auth", "register"]}
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"securepassword123\"\n}"
+            },
+            "url": {"raw": "{{base_url}}/api/v1/auth/login", "host": ["{{base_url}}"], "path": ["api", "v1", "auth", "login"]}
+          }
+        },
+        {
+          "name": "Get Me",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+            "url": {"raw": "{{base_url}}/api/v1/auth/me", "host": ["{{base_url}}"], "path": ["api", "v1", "auth", "me"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "API Keys",
+      "item": [
+        {
+          "name": "List Keys",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+            "url": {"raw": "{{base_url}}/api/v1/keys", "host": ["{{base_url}}"], "path": ["api", "v1", "keys"]}
+          }
+        },
+        {
+          "name": "Create Key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwt_token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Production Key\"\n}"
+            },
+            "url": {"raw": "{{base_url}}/api/v1/keys", "host": ["{{base_url}}"], "path": ["api", "v1", "keys"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Downloads",
+      "item": [
+        {
+          "name": "Get Video Info",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwt_token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://www.dailymotion.com/video/x8q3exq\"\n}"
+            },
+            "url": {"raw": "{{base_url}}/api/v1/download/info", "host": ["{{base_url}}"], "path": ["api", "v1", "download", "info"]}
+          }
+        },
+        {
+          "name": "Get Download URL",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "X-API-Key", "value": "{{api_key}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://www.dailymotion.com/video/x8q3exq\",\n  \"quality\": \"720p\"\n}"
+            },
+            "url": {"raw": "{{base_url}}/api/v1/download/url", "host": ["{{base_url}}"], "path": ["api", "v1", "download", "url"]}
+          }
+        },
+        {
+          "name": "Download History",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+            "url": {"raw": "{{base_url}}/api/v1/download/history?page=1&limit=20", "host": ["{{base_url}}"], "path": ["api", "v1", "download", "history"], "query": [{"key": "page", "value": "1"}, {"key": "limit", "value": "20"}]}
+          }
+        },
+        {
+          "name": "Usage Stats",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+            "url": {"raw": "{{base_url}}/api/v1/download/usage", "host": ["{{base_url}}"], "path": ["api", "v1", "download", "usage"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Get Plans",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/api/v1/payments/plans", "host": ["{{base_url}}"], "path": ["api", "v1", "payments", "plans"]}
+          }
+        },
+        {
+          "name": "Initialize Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwt_token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"planId\": \"starter\"\n}"
+            },
+            "url": {"raw": "{{base_url}}/api/v1/payments/initialize", "host": ["{{base_url}}"], "path": ["api", "v1", "payments", "initialize"]}
+          }
+        },
+        {
+          "name": "Verify Payment",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/api/v1/payments/verify?reference=dm_1234567890", "host": ["{{base_url}}"], "path": ["api", "v1", "payments", "verify"], "query": [{"key": "reference", "value": "dm_1234567890"}]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{admin_jwt}}"}],
+            "url": {"raw": "{{base_url}}/api/v1/admin/dashboard", "host": ["{{base_url}}"], "path": ["api", "v1", "admin", "dashboard"]}
+          }
+        },
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{admin_jwt}}"}],
+            "url": {"raw": "{{base_url}}/api/v1/admin/users?page=1&limit=20", "host": ["{{base_url}}"], "path": ["api", "v1", "admin", "users"], "query": [{"key": "page", "value": "1"}, {"key": "limit", "value": "20"}]}
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {"key": "base_url", "value": "http://localhost:3000", "type": "string"},
+    {"key": "jwt_token", "value": "", "type": "string"},
+    {"key": "api_key", "value": "", "type": "string"},
+    {"key": "admin_jwt", "value": "", "type": "string"}
+  ]
+}

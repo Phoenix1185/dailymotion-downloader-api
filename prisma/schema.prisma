@@ -1,0 +1,158 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String?
+  avatar        String?
+  role          UserRole  @default(USER)
+  authProvider  AuthProvider @default(LOCAL)
+  providerId    String?
+  password      String?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+
+  // Subscription & Billing
+  subscription  Subscription?
+  payments      Payment[]
+
+  // API & Usage
+  apiKeys       ApiKey[]
+  downloadLogs  DownloadLog[]
+
+  @@map("users")
+}
+
+model Subscription {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tier              String   @default("free")
+  status            SubscriptionStatus @default(ACTIVE)
+
+  // Paystack fields
+  paystackCustomerCode  String?
+  paystackSubscriptionCode String?
+  paystackPlanCode    String?
+
+  // Limits
+  downloadLimit     Int      @default(5)
+  downloadsUsed     Int      @default(0)
+  apiKeyLimit       Int      @default(1)
+  quality           String   @default("480p")
+
+  // Billing cycle
+  currentPeriodStart DateTime @default(now())
+  currentPeriodEnd   DateTime?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  canceledAt        DateTime?
+
+  @@map("subscriptions")
+}
+
+model Payment {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  amount        Int      // in kobo
+  currency      String   @default("NGN")
+  status        PaymentStatus @default(PENDING)
+
+  // Paystack fields
+  paystackReference String? @unique
+  paystackTransactionId String?
+  paystackAuthorizationCode String?
+
+  metadata      Json?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("payments")
+}
+
+model ApiKey {
+  id            String    @id @default(uuid())
+  name          String
+  key           String    @unique
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isActive      Boolean   @default(true)
+  lastUsedAt    DateTime?
+  usageCount    Int       @default(0)
+  rateLimit     Int       @default(100)
+  createdAt     DateTime  @default(now())
+  expiresAt     DateTime?
+
+  @@map("api_keys")
+}
+
+model DownloadLog {
+  id            String    @id @default(uuid())
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  apiKeyId      String?
+  videoUrl      String
+  videoId       String
+  title         String?
+  duration      Int?
+  quality       String?
+  format        String?
+  status        DownloadStatus @default(PENDING)
+  errorMessage  String?
+  fileSize      BigInt?
+  downloadUrl   String?
+  metadata      Json?
+  createdAt     DateTime  @default(now())
+  completedAt   DateTime?
+
+  @@map("download_logs")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+  GITHUB
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  UNPAID
+  TRIALING
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  ABANDONED
+  REVERSED
+}
+
+enum DownloadStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
